@@ -1,0 +1,47 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  category  String
+  regionId  Int
+  region    Region   @relation(fields: [regionId], references: [id])
+  orders    OrderItem[]
+  createdAt DateTime @default(now())
+}
+
+model Region {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+
+model Customer {
+  id      Int      @id @default(autoincrement())
+  name    String
+  email   String   @unique
+  orders  Order[]
+}
+
+model Order {
+  id         Int          @id @default(autoincrement())
+  customerId Int
+  customer   Customer     @relation(fields: [customerId], references: [id])
+  items      OrderItem[]
+  createdAt  DateTime     @default(now())
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+}
